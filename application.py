@@ -10,7 +10,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Hugging Face API setup with DialoGPT-medium model
-API_URL = "https://api-inference.huggingface.co/models/EleutherAI/gpt-neo-1.3B"
+API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large"
 API_KEY = os.getenv("HF_API_KEY")
 
 headers = {"Authorization": f"Bearer {API_KEY}"}
