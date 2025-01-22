@@ -9,7 +9,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Hugging Face API setup with DialoGPT-medium model
+# Hugging Face API setup with BART model
 API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large"
 API_KEY = os.getenv("HF_API_KEY")
 
@@ -46,9 +46,14 @@ def home():
             response = query_huggingface(payload)
             print(f"Response from Hugging Face API: {response}")  # Debugging: log API response
             
-            # Extract chatbot reply
-            # DialoGPT returns a list, so we need to access the first item in the list
-            chatbot_reply = response[0].get("generated_text", "Sorry, I didn't understand that.")
+            # Check if response is a dictionary or list
+            if isinstance(response, dict):
+                chatbot_reply = response.get("generated_text", "Sorry, I didn't understand that.")
+            elif isinstance(response, list) and len(response) > 0:
+                chatbot_reply = response[0].get("generated_text", "Sorry, I didn't understand that.")
+            else:
+                chatbot_reply = "Sorry, I couldn't generate a response."
+            
             return jsonify({"reply": chatbot_reply})
         
         except Exception as e:
