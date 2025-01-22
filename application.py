@@ -31,4 +31,5 @@ def home():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Make Flask listen on the correct port provided by Render
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
