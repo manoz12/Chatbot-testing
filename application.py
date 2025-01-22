@@ -22,10 +22,18 @@ def query_huggingface(payload):
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
-        user_input = request.form.get("message")
+        # Adjust to handle JSON input from the frontend
+        data = request.get_json()  # Get the JSON from the request body
+        user_input = data.get("message")
+        
+        # Prepare payload for Hugging Face API
         payload = {"inputs": user_input}
         response = query_huggingface(payload)
+        
+        # Extract the response text
         chatbot_reply = response.get("generated_text", "Sorry, I didn't understand that.")
+        
+        # Return the response as JSON
         return jsonify({"reply": chatbot_reply})
 
     return render_template("index.html")
