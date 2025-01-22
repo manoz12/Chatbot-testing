@@ -1,29 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #chatContainer {
+            width: 100%;
+            max-width: 600px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #chatBox {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+
+        #chatBox .userMessage, #chatBox .botMessage {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+
+        #chatBox .userMessage {
+            background-color: #cce5ff;
+            text-align: right;
+        }
+
+        #chatBox .botMessage {
+            background-color: #e2e3e5;
+            text-align: left;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 100px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>Chat with the Bot</h1>
-    <form id="chatForm" method="post">
-        <input type="text" name="message" placeholder="Type your message here" required>
-        <button type="submit">Send</button>
-    </form>
-    <div id="chatResponse"></div>
+
+    <div id="chatContainer">
+        <h1>Chat with the Bot</h1>
+        <div id="chatBox"></div>
+        <form id="chatForm" method="post">
+            <input type="text" name="message" placeholder="Type your message here" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
 
     <script>
         const form = document.getElementById("chatForm");
+        const chatBox = document.getElementById("chatBox");
+
         form.onsubmit = async (e) => {
             e.preventDefault();
+
+            // Get the user's message
             const message = form.message.value;
+
+            // Append user's message to the chat box
+            chatBox.innerHTML += `<div class="userMessage">${message}</div>`;
+
+            // Clear the input field
+            form.message.value = "";
+
+            // Send the message to the API and get the response
             const response = await fetch("/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message }),
+                body: JSON.stringify({ message })
             });
+
             const result = await response.json();
-            document.getElementById("chatResponse").innerText = result.reply;
+
+            // Append bot's reply to the chat box
+            chatBox.innerHTML += `<div class="botMessage">${result.reply}</div>`;
+
+            // Scroll to the bottom of the chat box to show the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
         };
     </script>
+
 </body>
 </html>
