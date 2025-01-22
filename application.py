@@ -2,19 +2,19 @@ from flask import Flask, request, render_template, jsonify
 from dotenv import load_dotenv
 import os
 import requests
+import time
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 
-# Hugging Face API setup with updated model
-API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-90M"
+# Hugging Face API setup with DialoGPT-medium model
+API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
 API_KEY = os.getenv("HF_API_KEY")
 
 headers = {"Authorization": f"Bearer {API_KEY}"}
 
-import time
 def query_huggingface(payload):
     try:
         response = requests.post(API_URL, headers=headers, json=payload)
@@ -24,7 +24,6 @@ def query_huggingface(payload):
         print(f"Error querying Hugging Face API: {e}")
         time.sleep(5)  # Retry after 5 seconds
         return {"generated_text": "Error occurred, retrying later."}
-
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -48,7 +47,8 @@ def home():
             print(f"Response from Hugging Face API: {response}")  # Debugging: log API response
             
             # Extract chatbot reply
-            chatbot_reply = response.get("generated_text", "Sorry, I didn't understand that.")
+            # DialoGPT returns a list, so we need to access the first item in the list
+            chatbot_reply = response[0].get("generated_text", "Sorry, I didn't understand that.")
             return jsonify({"reply": chatbot_reply})
         
         except Exception as e:
