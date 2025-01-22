@@ -9,20 +9,22 @@ load_dotenv()
 app = Flask(__name__)
 
 # Hugging Face API setup with updated model
-API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
+API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-90M"
 API_KEY = os.getenv("HF_API_KEY")
 
 headers = {"Authorization": f"Bearer {API_KEY}"}
 
+import time
 def query_huggingface(payload):
-    """Send a query to Hugging Face API."""
     try:
         response = requests.post(API_URL, headers=headers, json=payload)
-        response.raise_for_status()  # Raise an error for non-200 responses
+        response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
         print(f"Error querying Hugging Face API: {e}")
-        return {"error": "Failed to communicate with the Hugging Face API."}
+        time.sleep(5)  # Retry after 5 seconds
+        return {"generated_text": "Error occurred, retrying later."}
+
 
 @app.route("/", methods=["GET", "POST"])
 def home():
