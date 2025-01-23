@@ -9,8 +9,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Hugging Face API setup with DialoGPT-medium model
-API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
+# Hugging Face API setup with a better model (e.g., OpenAssistant/oasst-sft-1-pythia-12b)
+API_URL = "https://api-inference.huggingface.co/models/OpenAssistant/oasst-sft-1-pythia-12b"
 API_KEY = os.getenv("HF_API_KEY")
 
 headers = {"Authorization": f"Bearer {API_KEY}"}
@@ -47,8 +47,8 @@ def home():
             print(f"Response from Hugging Face API: {response}")  # Debugging: log API response
             
             # Extract chatbot reply
-            # DialoGPT returns a list, so we need to access the first item in the list
-            chatbot_reply = response[0].get("generated_text", "Sorry, I didn't understand that.")
+            # The response format may vary by model
+            chatbot_reply = response.get("generated_text", "Sorry, I didn't understand that.")
             return jsonify({"reply": chatbot_reply})
         
         except Exception as e:
