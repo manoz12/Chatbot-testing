@@ -19,11 +19,11 @@ def query_huggingface(payload):
     try:
         response = requests.post(API_URL, headers=headers, json=payload)
         response.raise_for_status()
-        return response.json()
+        return response.json()  # Returns a list of responses
     except requests.exceptions.RequestException as e:
         print(f"Error querying Hugging Face API: {e}")
         time.sleep(5)  # Retry after 5 seconds
-        return {"generated_text": "Error occurred, retrying later."}
+        return [{"generated_text": "Error occurred, retrying later."}]
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -38,8 +38,12 @@ def home():
             payload = {"inputs": user_input}
             response = query_huggingface(payload)
 
-            # Extract chatbot reply
-            chatbot_reply = response.get("generated_text", "Sorry, I didn't understand that.")
+            # Ensure the response is a list and extract the first item
+            if isinstance(response, list) and len(response) > 0:
+                chatbot_reply = response[0].get("generated_text", "Sorry, I didn't understand that.")
+            else:
+                chatbot_reply = "Sorry, I didn't understand that."
+
             return jsonify({"reply": chatbot_reply})
 
         except Exception as e:
@@ -47,6 +51,7 @@ def home():
             return jsonify({"reply": "An error occurred. Please try again later."})
 
     return render_template("index.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
